@@ -2,7 +2,7 @@ module.exports = {
   cliente: {
     nome: "Azul Mob",
     subdomain: "azulmob-bi",
-    coolify_app_uuid: "usy43v8ncaj6zlw1q9mnf94u",
+    coolify_app_uuid: "ps8kq8nqn6jjuq2j6uhzhze0",
     cor_primaria: "#3b82f6",
   },
 
