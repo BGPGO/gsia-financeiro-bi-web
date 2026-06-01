@@ -1,0 +1,33 @@
+# Credenciais
+.env
+.env.local
+
+# Build artifacts. data/ é regenerado no container via fetch-data/fetch-pedidos.
+# data.js e app.bundle.js são commitados como SEED (o Dockerfile faz COPY deles).
+data/
+data-extras/
+data-extras.js
+
+# Reports cacheados (gerados por write-reports.cjs do cliente, ou por API on-the-fly)
+report.json
+report-*.json
+
+# Cliente-específico (cada cliente tem seu próprio).
+# FB Pneus: trackeado porque o container Coolify executa fetch-data.cjs internamente
+# e precisa do bi.config.js no build.
+# bi.config.js
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Editor
+.vscode/
+.idea/
+
+# Não ignora QUICK_START.pdf — ele é distribuído junto pra time não-dev
+# QUICK_START.pdf
