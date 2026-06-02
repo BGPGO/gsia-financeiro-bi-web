@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "empresa": "AZUL MOB",
+  "periodo": "Março/2026",
+  "year": 2026,
+  "month": 3,
+  "filter": "realizado",
+  "secoes": {
+    "visao_geral": {
+      "title": "Visão Geral",
+      "analysis": "Em março de 2026, a AZUL MOB registrou receita total de R$ 5.808.762,78 contra despesas de R$ 6.118.323,38, resultando em saldo líquido negativo de R$ 309.560,60 e margem operacional de -5,33%. Embora o resultado ainda permaneça deficitário, observa-se uma recuperação significativa em relação a fevereiro, com crescimento de 23,4% na receita, indicando retomada parcial da atividade operacional e maior volume de contratos faturados no período.\n\nO déficit acumulado no primeiro trimestre de 2026 totaliza R$ 1.041.900,44, evidenciando que a empresa ainda não conseguiu equilibrar suas contas no exercício corrente. A redução do gap entre receitas e despesas em março é um sinal positivo, porém insuficiente para reverter a trajetória negativa consolidada desde janeiro. A gestão financeira precisa intensificar ações de contenção de custos e ampliação de receita para buscar o ponto de equilíbrio nos próximos meses.",
+      "error": null
+    },
+    "receita": {
+      "title": "Receita",
+      "analysis": "A receita de março totalizou R$ 5.808.762,78, sustentada predominantemente pela linha de Serviços Prestados, que respondeu por R$ 5.042.301,70, representando aproximadamente 86,8% do faturamento total. A Venda de Veículos contribuiu com R$ 697.928,25, configurando-se como a segunda maior fonte de receita no mês, seguida por Limite Cartão com R$ 51.609,77. Essa concentração reforça a dependência da empresa em relação aos contratos de prestação de serviços de transporte, típicos da operação junto ao setor público.\n\nEntre os principais clientes, destacaram-se a Diretoria de Ensino Sul 2 com R$ 946.699,90, SPAL com R$ 922.835,81, Diretoria de Ensino Sul 1 com R$ 515.655,02, Secretaria de Direitos Humanos com R$ 469.405,47 e Prefeitura de Campinas com R$ 430.425,12. A carteira de clientes permanece fortemente vinculada a órgãos públicos, o que garante previsibilidade contratual, mas exige atenção ao calendário de pagamentos e eventuais atrasos inerentes à administração pública.",
+      "error": null
+    },
+    "despesa": {
+      "title": "Despesa",
+      "analysis": "As despesas totais em março somaram R$ 6.118.323,38, com as maiores concentrações nas rubricas de CDC (R$ 811.861,87), Consórcio (R$ 521.848,11), Combustível (R$ 521.694,26), Salários (R$ 448.911,30) e Compra de Serviços (R$ 356.290,43). O peso do CDC e dos consórcios reflete os compromissos financeiros com a aquisição e renovação da frota, enquanto combustível e salários representam os custos operacionais essenciais para manutenção da atividade de transporte.\n\nEntre os fornecedores com maior volume de pagamentos, a Receita Federal liderou com R$ 696.269,15, seguida por Ticket Log com R$ 413.953,85, Mobilize com R$ 408.080,92, CNP Consórcio com R$ 335.822,99 e VR Benefícios com R$ 297.797,99. O elevado desembolso junto à Receita Federal indica carga tributária expressiva, enquanto os pagamentos a Ticket Log e Mobilize estão diretamente atrelados à operação da frota. A gestão de fornecedores deve buscar renegociação de prazos e condições para aliviar a pressão sobre o caixa.",
+      "error": null
+    },
+    "fluxo_caixa": {
+      "title": "Fluxo de Caixa",
+      "analysis": "O fluxo de caixa de março apresentou resultado negativo de R$ 309.560,60, configurando o terceiro mês consecutivo de saídas superiores às entradas. Apesar da recuperação expressiva da receita em relação a fevereiro, o volume de despesas operacionais e financeiras manteve-se elevado, impedindo que o crescimento do faturamento se traduzisse em geração de caixa positiva. O descompasso entre o ritmo de recebimentos e a concentração de pagamentos no período contribuiu para a manutenção do déficit.\n\nO saldo acumulado negativo de R$ 1.041.900,44 no trimestre exige atenção redobrada ao planejamento de caixa nos meses seguintes. A tendência de redução do déficit mensal, que passou de patamares mais elevados em janeiro e fevereiro para R$ 309.560,60 em março, sugere que a curva está se aproximando do equilíbrio, porém ainda não o atingiu. É fundamental que a empresa monitore rigorosamente o cronograma de recebíveis e busque antecipar receitas sempre que possível.",
+      "error": null
+    },
+    "tesouraria": {
+      "title": "Tesouraria",
+      "analysis": "A posição de tesouraria em março de 2026 registra contas a receber no valor de R$ 49.888,55 e contas a pagar zeradas (R$ 0,00). A ausência de obrigações em aberto indica que a empresa está em dia com seus compromissos de curto prazo, tendo liquidado integralmente os pagamentos programados para o período. O saldo a receber, embora modesto em relação ao faturamento mensal, representa valores ainda pendentes de liquidação por parte dos clientes.\n\nO cenário de contas a pagar zeradas pode refletir tanto uma gestão disciplinada de pagamentos quanto a concentração de vencimentos em períodos anteriores. De todo modo, a baixa exposição a obrigações pendentes é favorável à saúde financeira de curto prazo da empresa. Recomenda-se acompanhar de perto o recebimento dos R$ 49.888,55 em aberto para evitar que eventuais inadimplências comprometam a já delicada posição de caixa acumulada no trimestre.",
+      "error": null
+    },
+    "comparativo": {
+      "title": "Comparativo",
+      "analysis": "Na comparação com fevereiro de 2026, março apresentou avanço expressivo de 23,4% na receita, sinalizando retomada da atividade comercial após um mês de desempenho mais fraco. Esse crescimento foi impulsionado principalmente pelo aumento no volume de Serviços Prestados e pela contribuição da Venda de Veículos, que reforçou o faturamento total. Apesar do avanço na linha de receita, as despesas mantiveram patamar elevado, limitando a conversão do crescimento em resultado positivo.\n\nA margem líquida de -5,33% em março, embora ainda negativa, representa melhora em relação ao mês anterior, evidenciando que a trajetória de recuperação está em curso. O déficit mensal recuou de forma consistente, sugerindo que a operação caminha gradualmente em direção ao equilíbrio. Contudo, a manutenção de custos fixos elevados, especialmente em CDC, consórcio e combustível, continua sendo o principal fator de pressão sobre a rentabilidade da empresa.",
+      "error": null
+    }
+  },
+  "conclusao": "O mês de março de 2026 consolidou uma trajetória de recuperação parcial para a AZUL MOB, com crescimento de 23,4% na receita em relação a fevereiro e redução do déficit mensal para R$ 309.560,60, ainda que o resultado acumulado no primeiro trimestre permaneça negativo em R$ 1.041.900,44. A operação demonstra resiliência na captação de receitas junto ao setor público, porém a estrutura de custos segue pressionando os resultados. Recomenda-se, em primeiro lugar, a revisão e renegociação dos contratos de CDC e consórcio para alongamento de prazos e redução do impacto mensal no caixa. Em segundo lugar, é necessário implementar um programa de eficiência em combustível, incluindo monitoramento de consumo por veículo e avaliação de rotas, dado que esta rubrica representa um dos maiores custos operacionais. Por fim, sugere-se intensificar a cobrança dos valores a receber e buscar antecipação de recebíveis junto aos órgãos públicos contratantes, de modo a fortalecer a posição de caixa e viabilizar o equilíbrio financeiro ainda no segundo trimestre de 2026."
+}

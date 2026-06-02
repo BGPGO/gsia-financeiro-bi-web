@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-06-02T00:00:00.000Z",
+  "empresa": "AZUL MOB",
+  "periodo": "Maio/2026",
+  "year": 2026,
+  "month": 5,
+  "filter": "realizado",
+  "secoes": {
+    "visao_geral": {
+      "title": "Visão Geral",
+      "analysis": "A AZUL MOB encerrou maio de 2026 com receita total de R$ 6.693.409,52 e despesa de R$ 6.197.499,27, resultando em um saldo líquido positivo de R$ 495.910,25 e margem de 7,41%. Este é o segundo mês consecutivo de superávit, consolidando a trajetória de recuperação financeira iniciada em abril. Embora o resultado líquido seja inferior ao registrado no mês anterior (R$ 811 mil), a manutenção do saldo positivo demonstra consistência operacional e disciplina na gestão de custos.\n\nO marco mais relevante do período é a reversão do saldo acumulado no ano para território positivo, atingindo R$ 265.201,58 — a primeira vez em 2026 que a empresa opera com resultado acumulado favorável. Esse ponto de inflexão reflete o esforço contínuo de ajuste entre receitas e despesas ao longo dos últimos meses, sinalizando que a operação encontrou um patamar mais sustentável de equilíbrio financeiro.",
+      "error": null
+    },
+    "receita": {
+      "title": "Receita",
+      "analysis": "A receita total de R$ 6.693.409,52 em maio teve como principal motor a rubrica de Serviços Prestados, responsável por R$ 6.194.299,79, o que representa aproximadamente 92,5% do faturamento. Essa concentração é característica do modelo de negócio da AZUL MOB, fortemente ancorado em contratos de prestação de serviços de transporte ao setor público. A Venda de Veículos contribuiu com R$ 373.645,74, seguida por Limite Cartão com R$ 102.418,50, Devoluções Compra Ativo com R$ 15.000,00 e Sinistro com R$ 4.766,60.\n\nOs cinco principais clientes geradores de receita foram a Diretoria de Ensino Sul 2 com R$ 1.085.726,55, SPAL com R$ 776.700,81, Diretoria de Ensino Sul 1 com R$ 631.911,53, Prefeitura de Campinas com R$ 578.310,73 e Secretaria da Pessoa com Deficiência com R$ 516.553,37. A carteira de clientes públicos permanece diversificada entre diferentes órgãos e esferas, o que reduz o risco de dependência excessiva de um único contratante e confere maior previsibilidade ao fluxo de receitas.",
+      "error": null
+    },
+    "despesa": {
+      "title": "Despesa",
+      "analysis": "As despesas totais de R$ 6.197.499,27 apresentaram composição coerente com a operação de transporte e mobilidade urbana. O Consórcio liderou os desembolsos com R$ 918.609,56, refletindo os compromissos de financiamento da frota. Em seguida, Combustível respondeu por R$ 592.052,55, Salários por R$ 496.670,52, Compra de Veículos por R$ 478.044,10 e Advogados por R$ 413.038,99. Juntas, essas cinco categorias representam parcela significativa do custo operacional total.\n\nOs principais fornecedores no mês foram Santander Consórcio com R$ 655.560,66, Ticket Log com R$ 540.512,26, Receita Federal com R$ 369.276,66, Hyundai com R$ 339.012,90 e VR Benefícios com R$ 313.738,23. Destaca-se a relevância dos custos com consórcio e combustível, que juntos superam R$ 1,5 milhão e constituem alavancas prioritárias para otimização. A despesa com advogados permanece elevada, indicando possível exposição a contingências jurídicas que merece acompanhamento contínuo por parte da gestão.",
+      "error": null
+    },
+    "fluxo_caixa": {
+      "title": "Fluxo de Caixa",
+      "analysis": "O fluxo de caixa de maio apresentou dinâmica positiva, com entradas superando saídas em R$ 495.910,25. A geração de caixa operacional permaneceu robusta graças à regularidade dos recebimentos de contratos públicos, que constituem a espinha dorsal da receita. A manutenção de superávit por dois meses consecutivos fortalece a posição de liquidez da empresa e permite maior folga para honrar compromissos de curto prazo sem recorrer a linhas emergenciais.\n\nO saldo acumulado do ano atingiu R$ 265.201,58 positivos, cruzando pela primeira vez em 2026 a linha do equilíbrio. Esse resultado representa uma conquista significativa após meses de déficit acumulado e demonstra que os ajustes operacionais e financeiros implementados ao longo do primeiro semestre estão surtindo efeito. A tendência positiva do fluxo de caixa, se mantida, deve proporcionar maior capacidade de investimento e redução da dependência de capital de terceiros nos próximos meses.",
+      "error": null
+    },
+    "tesouraria": {
+      "title": "Tesouraria",
+      "analysis": "A posição de tesouraria ao final de maio registra R$ 471.693,56 em contas a receber contra R$ 40.935,17 em contas a pagar, resultando em uma posição líquida altamente favorável de aproximadamente R$ 430 mil. Essa assimetria positiva indica que a empresa possui direitos a receber significativamente superiores às suas obrigações de curto prazo, reforçando a solidez da gestão de capital de giro no período.\n\nA baixa concentração de valores a pagar sugere que a empresa tem conseguido manter seus compromissos em dia, evitando acúmulo de passivos vencidos. O volume de contas a receber, por sua vez, é compatível com o perfil de clientes públicos que costumam operar com prazos de pagamento mais estendidos. A gestão da tesouraria deve continuar monitorando a pontualidade dos recebimentos públicos para garantir que a posição favorável se converta efetivamente em caixa disponível.",
+      "error": null
+    },
+    "comparativo": {
+      "title": "Comparativo",
+      "analysis": "Na comparação com abril de 2026, maio apresentou redução no resultado líquido de R$ 811 mil para R$ 495.910,25, uma queda de aproximadamente 39%. A receita manteve-se em patamar semelhante, mas o aumento relativo das despesas comprimiu a margem líquida. Ainda assim, o fato de maio representar o segundo mês consecutivo de superávit é mais relevante do que a variação pontual entre os dois períodos, pois confirma uma tendência estrutural de recuperação e não apenas um resultado isolado.\n\nO indicador mais expressivo na comparação mensal é a evolução do saldo acumulado no ano, que saltou de território negativo para R$ 265.201,58 positivos. A travessia para o campo positivo no acumulado anual demonstra que a empresa superou os déficits acumulados nos primeiros meses de 2026. Enquanto abril foi o mês da virada operacional, maio consolida essa virada e estabelece uma base mais firme para o segundo semestre, desde que a disciplina de custos seja mantida nos próximos meses.",
+      "error": null
+    }
+  },
+  "conclusao": "Maio de 2026 marca um ponto de inflexão histórico para a AZUL MOB: pela primeira vez no ano, o saldo acumulado cruza para território positivo, alcançando R$ 265.201,58. Com receita de R$ 6,69 milhões, despesa de R$ 6,20 milhões e margem de 7,41%, a empresa confirma pelo segundo mês consecutivo sua capacidade de gerar superávit operacional, consolidando a recuperação financeira iniciada em abril. A posição de tesouraria reforça a saúde financeira do período, com recebíveis de R$ 471 mil amplamente superiores aos R$ 41 mil a pagar.\n\nPara sustentar e ampliar essa trajetória positiva, recomenda-se em primeiro lugar intensificar a negociação dos custos com consórcio e combustível, que juntos ultrapassam R$ 1,5 milhão mensal e representam as maiores alavancas de otimização de margem. Em segundo lugar, é fundamental acelerar a conversão dos recebíveis em caixa efetivo, monitorando de perto os prazos de pagamento dos clientes públicos para evitar descasamentos de fluxo. Por fim, a gestão deve aproveitar o momento favorável para constituir reservas de contingência e reduzir gradualmente a exposição a despesas com contencioso jurídico, fortalecendo a resiliência financeira da operação para o segundo semestre de 2026."
+}
