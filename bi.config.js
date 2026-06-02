@@ -10,6 +10,19 @@ module.exports = {
     adapters: ["omie"],
     omie: {
       bancos_ok: [],
+      categorias_excluir: [
+        "0.01", "0.01.01", "0.01.02",           // Transferência entre contas
+        "1.02.95", "1.04.71", "1.04.91",         // Resgate CDB / Automático / Invest Fácil
+        "1.02.98",                                // Rendimento de Aplicação
+        "1.03.91", "1.03.93",                     // Resgate Consórcio / Devolução empréstimo
+        "1.04.03", "1.04.85", "1.04.98",         // Empréstimos Bancários (entrada)
+        "1.04.89", "1.04.80",                     // Transferência Auto CX AVAL / Estorno juros
+        "2.04.34", "2.04.70", "2.04.47",         // Empréstimo / Devolução / Laudo Transferência
+        "2.05.01", "2.05.03",                     // Juros / Pagamento Empréstimos
+        "2.05.86", "2.05.90",                     // Rendimento Aplicação / Aplicação CDB
+        "2.05.92", "2.05.93", "2.05.94",         // Estorno Transf / Empréstimo CG / Bancário
+        "2.07",                                   // Investimento
+      ],
     },
     drive: {
       base_path: "G:/Meu Drive/BGP/CLIENTES/BI/Azul Mob",

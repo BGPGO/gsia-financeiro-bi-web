@@ -211,7 +211,10 @@ function normalize(t, kind) {
 // Tambem exclui transferencias (categoria Entrada/Saida de Transferencia)
 // porque sao movimentacoes internas entre contas, nao receita/despesa real.
 const TRANSFERENCIA_RE = /transfer[eê]ncia/i;
-const CLIENTE_PROPRIO_RE = /limpuz/i;
+const CLIENTE_PROPRIO_RE = /azul\s*mob/i;
+let _cfgCatExcluir = [];
+try { _cfgCatExcluir = require('./bi.config.js').fontes?.omie?.categorias_excluir || []; } catch(e) {}
+const CATEGORIAS_EXCLUIR = new Set(_cfgCatExcluir);
 
 function normalizeMovimento(m) {
   const d = m.detalhes || {};
@@ -230,6 +233,8 @@ function normalizeMovimento(m) {
   // Filtro transferencias entre contas (nao sao receita/despesa real)
   const categoria = getCategoriaNome(d.cCodCateg);
   if (TRANSFERENCIA_RE.test(categoria)) return null;
+  // Filtro categorias não-operacionais (CDB, empréstimo, investimento, etc.)
+  if (CATEGORIAS_EXCLUIR.size && CATEGORIAS_EXCLUIR.has(d.cCodCateg || '')) return null;
 
   // Filtro contas correntes: apenas bancos formais (Santander/Sicredi/Sicoob).
   // Operacional interno (Caixa, adiantamentos de viagem, contas de socio) fica fora.
