@@ -392,13 +392,6 @@ const PageOverview = ({ filters, setFilters, onOpenFilters, statusFilter, drilld
             <div className="card-title-row">
               <h2 className="card-title">Fluxo de Caixa Projetado</h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                {fpVista === 'sem_inv' && invCount > 0 && (
-                  <span style={{ fontSize: 11, color: 'var(--amber)' }}>{invCount} investimentos excluídos</span>
-                )}
-                <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 6, overflow: 'hidden' }}>
-                  <BtnFP value="consolidado" label="Consolidado" />
-                  <BtnFP value="sem_inv"     label="Sem Investimento" />
-                </div>
               </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 14 }}>
@@ -513,7 +506,8 @@ const PageReceita = ({ filters, setFilters, onOpenFilters, statusFilter, drilldo
   const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month), [statusFilter, drilldown, year, month]);
   const mediaMes = B.TOTAL_RECEITA / 12;
   const numClientes = B.RECEITA_CLIENTES.length;
-  const ticket = numClientes > 0 ? B.TOTAL_RECEITA / numClientes : 0;
+  const numLancRec = (B.EXTRATO_RECEITAS || B.EXTRATO.filter(e => e[4] > 0)).length;
+  const ticket = numLancRec > 0 ? B.TOTAL_RECEITA / numLancRec : 0;
   const [range, setRange] = useState("12M");
   const refYear = (B.META && B.META.ref_year) || new Date().getFullYear();
 
@@ -617,7 +611,8 @@ const PageDespesa = ({ filters, setFilters, onOpenFilters, statusFilter, drilldo
   const totalDespesa = B.TOTAL_DESPESA;
   const mediaMes = totalDespesa / 12;
   const numFornec = B.DESPESA_FORNECEDORES.length;
-  const mediaDesp = numFornec > 0 ? totalDespesa / numFornec : 0;
+  const numLancDesp = (B.EXTRATO_DESPESAS || B.EXTRATO.filter(e => e[4] < 0)).length;
+  const ticketDesp = numLancDesp > 0 ? totalDespesa / numLancDesp : 0;
   const [range, setRange] = useState("12M");
   const refYear = (B.META && B.META.ref_year) || new Date().getFullYear();
 
@@ -659,7 +654,7 @@ const PageDespesa = ({ filters, setFilters, onOpenFilters, statusFilter, drilldo
         <KpiTile label="Despesas totais" value={(totalDespesa / 1e6).toFixed(2).replace(".", ",")} unit="M" sparkValues={B.MONTH_DATA.map(m => m.despesa)} sparkColor="var(--red)" tone="red" />
         <KpiTile label="Média por mês" value={(mediaMes / 1e3).toFixed(0)} unit="K" sparkValues={B.MONTH_DATA.map(m => m.despesa)} sparkColor="var(--red)" tone="red" />
         <KpiTile label="Fornecedores" value={String(numFornec)} sparkValues={B.MONTH_DATA.map(m => m.despesa > 0 ? 1 : 0)} sparkColor="var(--cyan)" tone="cyan" nonMonetary />
-        <KpiTile label="Média de despesa" value={mediaDesp > 0 ? (mediaDesp / 1e3).toFixed(2).replace(".", ",") : "0,00"} unit="K" sparkValues={B.MONTH_DATA.map(m => m.despesa / 30)} sparkColor="var(--red)" tone="red" />
+        <KpiTile label="Ticket médio" value={ticketDesp > 0 ? (ticketDesp / 1e3).toFixed(2).replace(".", ",") : "0,00"} unit="K" sparkValues={B.MONTH_DATA.map(m => m.despesa / 30)} sparkColor="var(--red)" tone="red" />
       </div>
 
       <div className="card">

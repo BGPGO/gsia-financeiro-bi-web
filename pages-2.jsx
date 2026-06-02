@@ -584,9 +584,7 @@ const PageTesouraria = ({ filters, setFilters, onOpenFilters, statusFilter, dril
 
         <div className="card">
           <h2 className="card-title">Fluxo a vencer (saldo projetado dia a dia)</h2>
-          {fpTotais.length === 0 ? (
-            <div className="status-line">Sem dados — execute fetch-saldos.cjs</div>
-          ) : (
+          {fpTotais.length === 0 ? null : (
             <>
               <div className="status-line" style={{ marginBottom: 8 }}>
                 {fpTotais.length} dias projetados · saldo inicial <b style={{ color: "var(--cyan)" }}>{B.fmt(fpSaldoInicial)}</b>
@@ -1512,7 +1510,7 @@ const PageFluxoProjetado = () => {
                   ))}
                   {!rows.length && (
                     <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 24 }}>
-                      {contaSel !== 'todas' ? 'Sem projeção para esta conta' : 'Sem dados — execute fetch-saldos.cjs'}
+                      {contaSel !== 'todas' ? 'Sem projeção para esta conta' : 'Sem dados de projeção disponíveis'}
                     </td></tr>
                   )}
                 </tbody>
