@@ -346,7 +346,7 @@ const Header = ({ page, onToggleSidebar, statusFilter, setStatusFilter, year, se
       {setYear && <YearSelect value={year} onChange={setYear} available={window.AVAILABLE_YEARS} />}
       {setMonth && <MonthSelect value={month} onChange={setMonth} />}
       {setDayMode && month > 0 && <DayFilterGroup dayMode={dayMode} setDayMode={setDayMode} day={day} setDay={setDay} dayFrom={dayFrom} setDayFrom={setDayFrom} dayTo={dayTo} setDayTo={setDayTo} week={week} setWeek={setWeek} />}
-      {setSemInvestimento && <InvestimentoToggle value={semInvestimento} onChange={setSemInvestimento} />}
+      {/* Toggle investimento removido */}
       {setStatusFilter && <StatusFilterSeg value={statusFilter} onChange={setStatusFilter} />}
       <BiExportButton />
     </header>
@@ -363,7 +363,11 @@ const MonthlyBars = ({ data, height = 230, type = "both", showLabels = true, onB
     <div style={{ position: "relative" }}>
       <div className="vbar-axis" style={{ height: height - 24 }}>
         {grids.map((g, i) => (<div key={i} className="grid" style={{ bottom: `${(g / max) * 100}%` }} />))}
-        {grids.map((g, i) => (<div key={"l"+i} className="glabel" style={{ bottom: `${(g / max) * 100}%` }}>{window.BIT.fmtK(g)}</div>))}
+        {grids.map((g, i) => {
+          const abs = Math.abs(g);
+          const lbl = abs >= 1e6 ? `${(abs/1e6).toFixed(1).replace('.',',')}M` : abs >= 1e3 ? `${(abs/1e3).toFixed(0)}K` : `${abs.toFixed(0)}`;
+          return <div key={"l"+i} className="glabel" style={{ bottom: `${(g / max) * 100}%` }}>{lbl}</div>;
+        })}
       </div>
       <div className="vbar-chart" style={{ height }}>
         {data.map((d, i) => {
