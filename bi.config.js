@@ -37,7 +37,7 @@ module.exports = {
       fluxo: "active",
       tesouraria: "active",
       comparativo: "active",
-      relatorio_ia: "hidden",
+      relatorio_ia: "active",
       valuation: "hidden",
     },
     outros: {

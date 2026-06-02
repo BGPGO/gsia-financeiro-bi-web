@@ -24,6 +24,7 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Seed inicial dos artefatos buildados (sobrescritos pelo cron)
 COPY data.js app.bundle.js /usr/share/nginx/html/
+COPY report*.json /usr/share/nginx/html/
 
 # Cron + entrypoint
 COPY crontab /etc/crontabs/root
