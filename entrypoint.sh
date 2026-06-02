@@ -13,7 +13,7 @@ touch /var/log/refresh.log
 # dcron NÃO herda env vars do PID 1 — exporta credenciais Omie pra arquivo
 # que refresh.sh lê. Sem isso, fetch-data dispara mas adapter falha por
 # OMIE_APP_KEY/SECRET undefined (descoberto 26/05/2026: data parou em 23/05).
-env | grep -E '^(OMIE_|BI_|COOLIFY_)' > /etc/cron-env || true
+env | grep -E '^(OMIE_|BI_|COOLIFY_|SUPABASE_)' > /etc/cron-env || true
 chmod 600 /etc/cron-env
 
 # Boot refresh em background — não atrasa o nginx ficar pronto.

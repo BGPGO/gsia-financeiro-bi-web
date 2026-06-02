@@ -27,8 +27,8 @@ COPY data.js app.bundle.js /usr/share/nginx/html/
 
 # Cron + entrypoint
 COPY crontab /etc/crontabs/root
-COPY refresh.sh entrypoint.sh /app/
-RUN chmod +x /app/refresh.sh /app/entrypoint.sh
+COPY refresh.sh entrypoint.sh sync-supabase.sh /app/
+RUN chmod +x /app/refresh.sh /app/entrypoint.sh /app/sync-supabase.sh
 
 EXPOSE 80
 ENTRYPOINT ["/sbin/tini", "--"]

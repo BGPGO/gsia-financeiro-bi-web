@@ -57,7 +57,13 @@ if [ -f data/movimentos.json ]; then
   echo "[$(TS)] build-jsx.cjs"
   node build-jsx.cjs
   cp -f data.js app.bundle.js /usr/share/nginx/html/
+  cp -f report*.json /usr/share/nginx/html/ 2>/dev/null || true
   echo "[$(TS)] refresh OK — data.js atualizado em $(stat -c %y /usr/share/nginx/html/data.js)"
+
+  # Sync pro Supabase Storage (se configurado)
+  if [ -f /app/sync-supabase.sh ]; then
+    /app/sync-supabase.sh || echo "[$(TS)] sync-supabase falhou (continua)"
+  fi
 else
   echo "[$(TS)] data/movimentos.json ausente — pulando build (servindo dados antigos)"
 fi
