@@ -374,9 +374,9 @@ const MultiSelectFilter = ({ label, options, selected, onChange }) => {
       {open && (
         <div className="multi-select-dropdown" style={{
           position: "absolute", top: "100%", right: 0, zIndex: 999,
-          background: "var(--card)", border: "1px solid var(--border)",
+          background: "var(--surface)", border: "1px solid var(--border)",
           borderRadius: 8, padding: "8px 0", marginTop: 4, minWidth: 220, maxHeight: 320,
-          overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+          overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
         }}>
           <label style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", cursor: "pointer", fontSize: 12, fontWeight: 600, color: "var(--cyan)", borderBottom: "1px solid var(--border)" }}>
             <input type="checkbox" checked={allSelected} onChange={() => onChange([])} />
@@ -396,7 +396,7 @@ const MultiSelectFilter = ({ label, options, selected, onChange }) => {
 
 // Header: breadcrumb + YearSelect + MonthSelect + StatusFilter + MultiSelectFilters
 const Header = ({ page, onToggleSidebar, statusFilter, setStatusFilter, year, setYear, month, setMonth, dayMode, setDayMode, day, setDay, dayFrom, setDayFrom, dayTo, setDayTo, week, setWeek, semInvestimento, setSemInvestimento, filterCentroCusto, setFilterCentroCusto, filterCategoria, setFilterCategoria }) => {
-  const centrosCusto = useMemo(() => window.ALL_CENTROS_CUSTO || [], []);
+  const naturezas = useMemo(() => window.ALL_NATUREZAS || [], []);
   const categorias = useMemo(() => window.ALL_CATEGORIAS || [], []);
   return (
     <header className="header">
@@ -409,8 +409,8 @@ const Header = ({ page, onToggleSidebar, statusFilter, setStatusFilter, year, se
         <b>{PAGE_TITLES[page] || "Visão Geral"}</b>
       </div>
       <div style={{ flex: 1 }} />
-      {setFilterCentroCusto && centrosCusto.length > 0 && (
-        <MultiSelectFilter label="Centro de Custo" options={centrosCusto} selected={filterCentroCusto || []} onChange={setFilterCentroCusto} />
+      {setFilterCentroCusto && naturezas.length > 0 && (
+        <MultiSelectFilter label="Natureza" options={naturezas} selected={filterCentroCusto || []} onChange={setFilterCentroCusto} />
       )}
       {setFilterCategoria && categorias.length > 0 && (
         <MultiSelectFilter label="Categoria" options={categorias} selected={filterCategoria || []} onChange={setFilterCategoria} />

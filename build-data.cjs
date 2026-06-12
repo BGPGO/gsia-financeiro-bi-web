@@ -157,6 +157,12 @@ function getDepartamentoNome(codigo) {
   return d ? d.descricao : `CC ${codigo}`;
 }
 
+function getNaturezaDRE(codCateg) {
+  if (!codCateg) return '';
+  const c = catById.get(String(codCateg));
+  return (c && c.dadosDRE && c.dadosDRE.descricaoDRE) || '';
+}
+
 function getClienteNome(codigo) {
   if (!codigo) return 'Sem cliente';
   const c = cliById.get(String(codigo));
@@ -183,7 +189,7 @@ function normalize(t, kind) {
     cliente,
     codCateg: t.codigo_categoria || '',
     categoria: getCategoriaNome(t.codigo_categoria),
-    centroCusto: getDepartamentoNome(t.codigo_departamento || (t.distribuicao && t.distribuicao[0] && t.distribuicao[0].cCodDep)),
+    centroCusto: getNaturezaDRE(t.codigo_categoria || ''),
     data_venc: dataVenc,
     data_efetiva: realizado ? dataPago : dataVenc,
     valor,
@@ -253,14 +259,13 @@ function normalizeMovimento(m) {
   let valor = realizado ? num(r.nValPago) : (num(r.nValAberto) || num(d.nValorTitulo));
   if (!valor && !realizado) valor = num(d.nValorTitulo);
   if (!valor) return null;
-  const dept = (m.departamentos && m.departamentos[0] && m.departamentos[0].cCodDepartamento) || null;
   return {
     id: d.nCodTitulo || null,
     kind: natureza === 'R' ? 'receita' : 'despesa',
     cliente,
     categoria,
     codCateg,
-    centroCusto: getDepartamentoNome(dept),
+    centroCusto: getNaturezaDRE(codCateg),
     data_venc: dataVenc,
     data_efetiva,
     valor: Math.abs(valor),
@@ -804,8 +809,8 @@ window.REF_YEAR = REF_YEAR;
 window.AVAILABLE_YEARS = AVAILABLE_YEARS;
 window.aggregateTx = aggregateTx;
 window.filterTx = filterTx;
-// Listas únicas de centro de custo e categoria extraídas de ALL_TX
-window.ALL_CENTROS_CUSTO = (function () {
+// Listas únicas de natureza DRE e categoria extraídas de ALL_TX
+window.ALL_NATUREZAS = (function () {
   const s = new Set();
   for (const r of ALL_TX) { if (r[8]) s.add(r[8]); }
   return Array.from(s).sort();
