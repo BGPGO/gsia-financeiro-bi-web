@@ -126,6 +126,9 @@ const PAGE_MODE_INJECT = `\n// Injetado por build-jsx.cjs a partir de bi.config.
     });
     var semInvestimento = si[0], setSemInvestimento = si[1];
 
+    var fcc = useState([]); var filterCentroCusto = fcc[0], setFilterCentroCusto = fcc[1];
+    var fcat = useState([]); var filterCategoria = fcat[0], setFilterCategoria = fcat[1];
+
     // BI export multi-tela: array de page-ids ou null. Quando setado, renderiza
     // todas as telas em sequencia + chama window.print() depois do layout pintar.
     var pp = useState(null); var printPages = pp[0], setPrintPages = pp[1];
@@ -290,6 +293,9 @@ const PAGE_MODE_INJECT = `\n// Injetado por build-jsx.cjs a partir de bi.config.
       : PAGE_COMPS[page];
 
     var PAGES_WITH_INVESTIMENTO = ['overview', 'despesa', 'fluxo', 'tesouraria', 'comparativo'];
+    var extraFilters = (filterCentroCusto.length > 0 || filterCategoria.length > 0)
+      ? { centroCusto: filterCentroCusto, categoria: filterCategoria } : undefined;
+
     var commonProps = {
       filters: filters,
       setFilters: setFilters,
@@ -302,6 +308,7 @@ const PAGE_MODE_INJECT = `\n// Injetado por build-jsx.cjs a partir de bi.config.
       drilldown: effectiveDrilldown,
       setDrilldown: handleSetDrilldown,
       semInvestimento: semInvestimento,
+      extraFilters: extraFilters,
     };
 
     // Modo print multi-tela: renderiza todas as paginas selecionadas em sequencia
@@ -354,6 +361,10 @@ const PAGE_MODE_INJECT = `\n// Injetado por build-jsx.cjs a partir de bi.config.
             setWeek={setWeek}
             semInvestimento={semInvestimento}
             setSemInvestimento={PAGES_WITH_INVESTIMENTO.indexOf(page) !== -1 ? setSemInvestimento : null}
+            filterCentroCusto={filterCentroCusto}
+            setFilterCentroCusto={setFilterCentroCusto}
+            filterCategoria={filterCategoria}
+            setFilterCategoria={setFilterCategoria}
           />
           <PageComp {...commonProps} />
         </div>

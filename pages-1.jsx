@@ -174,10 +174,10 @@ const IndicatorLine = ({ values, labels, height = 240, color = "var(--cyan)", fo
   );
 };
 
-const PageOverview = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown, setDrilldown, year, month, semInvestimento }) => {
-  const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month, semInvestimento), [statusFilter, drilldown, year, month, semInvestimento]);
+const PageOverview = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown, setDrilldown, year, month, semInvestimento, extraFilters }) => {
+  const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month, semInvestimento, extraFilters), [statusFilter, drilldown, year, month, semInvestimento, extraFilters]);
   // Ponto de Equilibrio (break-even): recomputa sob o mesmo contexto de filtro que B.
-  const PE = useMemo(() => window.computePE(statusFilter, drilldown, year, month, semInvestimento), [statusFilter, drilldown, year, month, semInvestimento]);
+  const PE = useMemo(() => window.computePE(statusFilter, drilldown, year, month, semInvestimento, extraFilters), [statusFilter, drilldown, year, month, semInvestimento, extraFilters]);
   const pctFmt = (v) => v == null ? "—" : (v * 100).toFixed(2).replace(".", ",") + "%";
   const [indicator, setIndicator] = useState("Valor líquido");
   const [fpVista, setFpVista] = useState('consolidado');
@@ -510,8 +510,8 @@ const PageIndicators = ({ statusFilter, drilldown, setDrilldown, year, month }) 
   );
 };
 
-const PageReceita = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown, setDrilldown, year, month }) => {
-  const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month), [statusFilter, drilldown, year, month]);
+const PageReceita = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown, setDrilldown, year, month, extraFilters }) => {
+  const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month, undefined, extraFilters), [statusFilter, drilldown, year, month, extraFilters]);
   const mediaMes = B.TOTAL_RECEITA / 12;
   const numClientes = B.RECEITA_CLIENTES.length;
   const numLancRec = (B.EXTRATO_RECEITAS || B.EXTRATO.filter(e => e[4] > 0)).length;
@@ -614,8 +614,8 @@ const PageReceita = ({ filters, setFilters, onOpenFilters, statusFilter, drilldo
   );
 };
 
-const PageDespesa = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown, setDrilldown, year, month, semInvestimento }) => {
-  const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month, semInvestimento), [statusFilter, drilldown, year, month, semInvestimento]);
+const PageDespesa = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown, setDrilldown, year, month, semInvestimento, extraFilters }) => {
+  const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month, semInvestimento, extraFilters), [statusFilter, drilldown, year, month, semInvestimento, extraFilters]);
   const totalDespesa = B.TOTAL_DESPESA;
   const mediaMes = totalDespesa / 12;
   const numFornec = B.DESPESA_FORNECEDORES.length;

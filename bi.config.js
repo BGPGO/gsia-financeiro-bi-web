@@ -44,7 +44,7 @@ module.exports = {
       fluxo_projetado: "hidden",
       indicators: "hidden",
       faturamento_produto: "hidden",
-      cmv: "active",
+      cmv: "hidden",
       curva_abc: "hidden",
       marketing: "hidden",
       hierarquia: "hidden",

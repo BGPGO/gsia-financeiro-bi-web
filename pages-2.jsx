@@ -5,8 +5,8 @@ const { useState, useMemo, useEffect } = React;
 // concatenado (build-jsx.cjs). Reutilizado aqui pra ajustar height/showLabels dos
 // TrendCharts em mobile.
 
-const PageFluxo = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown, setDrilldown, year, month, semInvestimento }) => {
-  const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month, semInvestimento), [statusFilter, drilldown, year, month, semInvestimento]);
+const PageFluxo = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown, setDrilldown, year, month, semInvestimento, extraFilters }) => {
+  const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month, semInvestimento, extraFilters), [statusFilter, drilldown, year, month, semInvestimento, extraFilters]);
   const isMobile = useIsMobile();
   const [view, setView] = useState("horizontal");
   const [range, setRange] = useState("12M");
@@ -248,13 +248,13 @@ const PageFluxo = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown
   );
 };
 
-const PageTesouraria = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown, setDrilldown, year, month, semInvestimento }) => {
+const PageTesouraria = ({ filters, setFilters, onOpenFilters, statusFilter, drilldown, setDrilldown, year, month, semInvestimento, extraFilters }) => {
   // Segmentos separados para KPIs e pulso: respeitam ano/mês mas sem drilldown externo
   // (drilldown externo viria de outro tipo, e.g. 'categoria' — não se aplica aqui)
-  const Breal = useMemo(() => window.getBit('realizado', null, year, month, semInvestimento), [year, month, semInvestimento]);
-  const Bpend = useMemo(() => window.getBit('a_pagar_receber', null, year, month, semInvestimento), [year, month, semInvestimento]);
+  const Breal = useMemo(() => window.getBit('realizado', null, year, month, semInvestimento, extraFilters), [year, month, semInvestimento, extraFilters]);
+  const Bpend = useMemo(() => window.getBit('a_pagar_receber', null, year, month, semInvestimento, extraFilters), [year, month, semInvestimento, extraFilters]);
   // Saldo acumulado: sempre ano completo (month=0) para mostrar os 12 meses
-  const Btudo = useMemo(() => window.getBit('tudo', null, year, 0, semInvestimento), [year, semInvestimento]);
+  const Btudo = useMemo(() => window.getBit('tudo', null, year, 0, semInvestimento, extraFilters), [year, semInvestimento, extraFilters]);
   const B = Breal; // alias para fmt / MONTHS / META
   const isMobile = useIsMobile();
 
@@ -716,8 +716,8 @@ const SaldoProjetadoChart = ({ pontos, saldoInicial }) => {
   );
 };
 
-const PageComparativo = ({ statusFilter, drilldown, setDrilldown, year, month, semInvestimento }) => {
-  const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month, semInvestimento), [statusFilter, drilldown, year, month, semInvestimento]);
+const PageComparativo = ({ statusFilter, drilldown, setDrilldown, year, month, semInvestimento, extraFilters }) => {
+  const B = useMemo(() => window.getBit(statusFilter, drilldown, year, month, semInvestimento, extraFilters), [statusFilter, drilldown, year, month, semInvestimento, extraFilters]);
   const refYear = window.REF_YEAR || new Date().getFullYear();
   const fmt = (B && B.fmt) || (n => `R$ ${n.toFixed(2)}`);
   const fmtPct = (B && B.fmtPct) || (n => `${n.toFixed(1)}%`);

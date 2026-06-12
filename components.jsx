@@ -252,28 +252,39 @@ const DayFilterGroup = ({ dayMode, setDayMode, day, setDay, dayFrom, setDayFrom,
 };
 
 // BiExportButton: modal com checkboxes pra exportar telas selecionadas como PDF
-const BI_EXPORT_PAGES = [
-  { id: "overview", label: "01 Visão Geral" },
-  { id: "receita", label: "02 Receita" },
-  { id: "despesa", label: "03 Despesa" },
-  { id: "fluxo", label: "04 Fluxo de Caixa" },
-  { id: "tesouraria", label: "05 Tesouraria" },
-  { id: "comparativo", label: "06 Comparativo" },
-  { id: "relatorio", label: "07 Relatório IA" },
-  { id: "valuation", label: "08 Valuation" },
-  { id: "indicators", label: "09 Indicadores" },
-  { id: "faturamento_produto", label: "10 Faturamento por Produto" },
-  { id: "curva_abc", label: "11 Curva ABC" },
-  { id: "marketing", label: "12 Marketing ADS" },
-  { id: "hierarquia", label: "13 Hierarquia ADS" },
-  { id: "detalhado", label: "14 Detalhado" },
-  { id: "profunda_cliente", label: "15 Profunda Cliente" },
-  { id: "crm", label: "16 CRM" },
+// Filtra automaticamente para mostrar apenas telas ativas (não hidden/upsell)
+const BI_EXPORT_ALL_PAGES = [
+  { id: "overview", label: "Visão Geral" },
+  { id: "receita", label: "Receita" },
+  { id: "despesa", label: "Despesa" },
+  { id: "fluxo", label: "Fluxo de Caixa" },
+  { id: "tesouraria", label: "Tesouraria" },
+  { id: "comparativo", label: "Comparativo" },
+  { id: "relatorio", label: "Relatório IA" },
+  { id: "valuation", label: "Valuation" },
+  { id: "indicators", label: "Indicadores" },
+  { id: "faturamento_produto", label: "Faturamento por Produto" },
+  { id: "cmv", label: "CMV" },
+  { id: "curva_abc", label: "Curva ABC" },
+  { id: "marketing", label: "Marketing ADS" },
+  { id: "hierarquia", label: "Hierarquia ADS" },
+  { id: "detalhado", label: "Detalhado" },
+  { id: "profunda_cliente", label: "Profunda Cliente" },
+  { id: "crm", label: "CRM" },
 ];
+const getActiveExportPages = () => {
+  const mode = window.BI_PAGE_MODE || {};
+  const active = BI_EXPORT_ALL_PAGES.filter(p => {
+    const m = mode[p.id];
+    return !m || m === 'active';
+  });
+  return active.map((p, i) => ({ ...p, label: `${String(i + 1).padStart(2, '0')} ${p.label}` }));
+};
 
 const BiExportButton = () => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState(() => new Set(BI_EXPORT_PAGES.map(p => p.id)));
+  const pages = useMemo(() => getActiveExportPages(), []);
+  const [selected, setSelected] = useState(() => new Set(pages.map(p => p.id)));
   const toggle = (id) => {
     setSelected(s => {
       const ns = new Set(s);
@@ -283,7 +294,7 @@ const BiExportButton = () => {
   };
   const submit = () => {
     if (selected.size === 0) return;
-    const ordered = BI_EXPORT_PAGES.filter(p => selected.has(p.id)).map(p => p.id);
+    const ordered = pages.filter(p => selected.has(p.id)).map(p => p.id);
     if (window.startBiExport) window.startBiExport(ordered);
     setOpen(false);
   };
@@ -300,7 +311,7 @@ const BiExportButton = () => {
               Selecione as telas para incluir no PDF. Cada tela vira uma página A4 com o tema escuro mantido.
             </p>
             <div className="bi-export-grid">
-              {BI_EXPORT_PAGES.map(p => (
+              {pages.map(p => (
                 <label key={p.id} className="bi-export-row">
                   <input
                     type="checkbox"
@@ -313,7 +324,7 @@ const BiExportButton = () => {
             </div>
             <div className="bi-export-actions">
               <div style={{ display: "flex", gap: 8 }}>
-                <button className="btn-ghost" onClick={() => setSelected(new Set(BI_EXPORT_PAGES.map(p => p.id)))}>Todas</button>
+                <button className="btn-ghost" onClick={() => setSelected(new Set(pages.map(p => p.id)))}>Todas</button>
                 <button className="btn-ghost" onClick={() => setSelected(new Set())}>Nenhuma</button>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
@@ -330,8 +341,63 @@ const BiExportButton = () => {
   );
 };
 
-// Header: breadcrumb + YearSelect + MonthSelect + StatusFilter
-const Header = ({ page, onToggleSidebar, statusFilter, setStatusFilter, year, setYear, month, setMonth, dayMode, setDayMode, day, setDay, dayFrom, setDayFrom, dayTo, setDayTo, week, setWeek, semInvestimento, setSemInvestimento }) => {
+// MultiSelectFilter: dropdown com checkboxes para filtro multiseleção
+const MultiSelectFilter = ({ label, options, selected, onChange }) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const count = selected.length;
+  const allSelected = count === 0;
+
+  useEffect(() => {
+    if (!open) return;
+    const onClickOut = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", onClickOut);
+    return () => document.removeEventListener("mousedown", onClickOut);
+  }, [open]);
+
+  const toggle = (val) => {
+    if (selected.includes(val)) onChange(selected.filter(v => v !== val));
+    else onChange([...selected, val]);
+  };
+
+  return (
+    <div className="multi-select-filter" ref={ref} style={{ position: "relative" }}>
+      <button
+        className={`btn-ghost hd-filter-btn ${count > 0 ? "active" : ""}`}
+        onClick={() => setOpen(o => !o)}
+        style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, padding: "4px 10px", whiteSpace: "nowrap" }}
+      >
+        <Icon name="filter" style={{ width: 14, height: 14 }} />
+        <span>{label}</span>
+        {count > 0 && <span className="multi-select-badge">{count}</span>}
+      </button>
+      {open && (
+        <div className="multi-select-dropdown" style={{
+          position: "absolute", top: "100%", right: 0, zIndex: 999,
+          background: "var(--card)", border: "1px solid var(--border)",
+          borderRadius: 8, padding: "8px 0", marginTop: 4, minWidth: 220, maxHeight: 320,
+          overflowY: "auto", boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+        }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", cursor: "pointer", fontSize: 12, fontWeight: 600, color: "var(--cyan)", borderBottom: "1px solid var(--border)" }}>
+            <input type="checkbox" checked={allSelected} onChange={() => onChange([])} />
+            <span>Todos</span>
+          </label>
+          {options.map(opt => (
+            <label key={opt} style={{ display: "flex", alignItems: "center", gap: 8, padding: "5px 14px", cursor: "pointer", fontSize: 12, color: "var(--text)" }}>
+              <input type="checkbox" checked={selected.includes(opt)} onChange={() => toggle(opt)} />
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{opt}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Header: breadcrumb + YearSelect + MonthSelect + StatusFilter + MultiSelectFilters
+const Header = ({ page, onToggleSidebar, statusFilter, setStatusFilter, year, setYear, month, setMonth, dayMode, setDayMode, day, setDay, dayFrom, setDayFrom, dayTo, setDayTo, week, setWeek, semInvestimento, setSemInvestimento, filterCentroCusto, setFilterCentroCusto, filterCategoria, setFilterCategoria }) => {
+  const centrosCusto = useMemo(() => window.ALL_CENTROS_CUSTO || [], []);
+  const categorias = useMemo(() => window.ALL_CATEGORIAS || [], []);
   return (
     <header className="header">
       <button className="hd-icon-btn hd-menu-btn" title="Menu" onClick={onToggleSidebar}><Icon name="menu" /></button>
@@ -343,6 +409,12 @@ const Header = ({ page, onToggleSidebar, statusFilter, setStatusFilter, year, se
         <b>{PAGE_TITLES[page] || "Visão Geral"}</b>
       </div>
       <div style={{ flex: 1 }} />
+      {setFilterCentroCusto && centrosCusto.length > 0 && (
+        <MultiSelectFilter label="Centro de Custo" options={centrosCusto} selected={filterCentroCusto || []} onChange={setFilterCentroCusto} />
+      )}
+      {setFilterCategoria && categorias.length > 0 && (
+        <MultiSelectFilter label="Categoria" options={categorias} selected={filterCategoria || []} onChange={setFilterCategoria} />
+      )}
       {setYear && <YearSelect value={year} onChange={setYear} available={window.AVAILABLE_YEARS} />}
       {setMonth && <MonthSelect value={month} onChange={setMonth} />}
       {setDayMode && month > 0 && <DayFilterGroup dayMode={dayMode} setDayMode={setDayMode} day={day} setDay={setDay} dayFrom={dayFrom} setDayFrom={setDayFrom} dayTo={dayTo} setDayTo={setDayTo} week={week} setWeek={setWeek} />}

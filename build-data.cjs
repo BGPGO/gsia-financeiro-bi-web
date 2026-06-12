@@ -804,12 +804,23 @@ window.REF_YEAR = REF_YEAR;
 window.AVAILABLE_YEARS = AVAILABLE_YEARS;
 window.aggregateTx = aggregateTx;
 window.filterTx = filterTx;
+// Listas únicas de centro de custo e categoria extraídas de ALL_TX
+window.ALL_CENTROS_CUSTO = (function () {
+  const s = new Set();
+  for (const r of ALL_TX) { if (r[8]) s.add(r[8]); }
+  return Array.from(s).sort();
+})();
+window.ALL_CATEGORIAS = (function () {
+  const s = new Set();
+  for (const r of ALL_TX) { if (r[3]) s.add(r[3]); }
+  return Array.from(s).sort();
+})();
 window.FLUXO_PROJETADO = ${JSON.stringify(saldos || { totais: [], contas: [], rows: [], updatedAt: null, error: 'execute fetch-saldos.cjs to generate' })};
 window.BI_CMV = ${JSON.stringify(BI_CMV)};
 // getBit: SEMPRE recomputa via recomputeBit (sem cache de window.BIT).
 // Evita lag no toggle Previsto/Realizado e suporta year/month arbitrario.
 // month: 0 = ano completo, 1-12 = mes especifico.
-window.getBit = function (statusFilter, drilldown, year, month, semInv) {
+window.getBit = function (statusFilter, drilldown, year, month, semInv, extraFilters) {
   const sf = statusFilter || window.BIT_FILTER || 'realizado';
   const y = year || window.REF_YEAR;
   let dd = drilldown;
@@ -818,13 +829,26 @@ window.getBit = function (statusFilter, drilldown, year, month, semInv) {
     const ym = y + '-' + mm;
     dd = { type: 'mes', value: ym, label: ym };
   }
-  return window.recomputeBit(sf, dd, y, semInv);
+  return window.recomputeBit(sf, dd, y, semInv, extraFilters);
 };
-// Cross-filter helper: combina statusFilter + drilldown + semInv e retorna BIT-like
+// Cross-filter helper: combina statusFilter + drilldown + semInv + extraFilters e retorna BIT-like
 // com KPIs/charts/extrato recalculados em ~10ms (17k rows).
-window.recomputeBit = function (statusFilter, drilldown, year, semInv) {
+// extraFilters: { centroCusto: string[], categoria: string[] } — arrays vazios = sem filtro
+window.recomputeBit = function (statusFilter, drilldown, year, semInv, extraFilters) {
   let filtered = filterTx(ALL_TX, statusFilter, drilldown);
   if (semInv) filtered = filterTxSemInv(filtered);
+  if (extraFilters) {
+    const cc = extraFilters.centroCusto;
+    const cat = extraFilters.categoria;
+    if (cc && cc.length > 0) {
+      const ccSet = new Set(cc);
+      filtered = filtered.filter(r => ccSet.has(r[8] || ''));
+    }
+    if (cat && cat.length > 0) {
+      const catSet = new Set(cat);
+      filtered = filtered.filter(r => catSet.has(r[3]));
+    }
+  }
   const agg = aggregateTx(filtered, year || REF_YEAR);
   // Mescla com BIT base pra preservar META, helpers (fmt, fmtK), MONTHS etc.
   const base = window.BIT || {};
@@ -842,7 +866,7 @@ window.recomputeBit = function (statusFilter, drilldown, year, semInv) {
 //   Ponto de Equilibrio      = Custos Fixos / Margem de Contribuicao %
 //   Margem de Seguranca %     = (Receita - Ponto de Equilibrio) / Receita
 // Custos Fixos/Variaveis sao classificados em build-data via categoria_superior (row[10]).
-window.computePE = function (statusFilter, drilldown, year, month, semInv) {
+window.computePE = function (statusFilter, drilldown, year, month, semInv, extraFilters) {
   const sf = statusFilter || window.BIT_FILTER || 'realizado';
   const y = year || window.REF_YEAR;
   let dd = drilldown;
@@ -852,6 +876,12 @@ window.computePE = function (statusFilter, drilldown, year, month, semInv) {
   }
   let filtered = filterTx(ALL_TX, sf, dd);
   if (semInv) filtered = filterTxSemInv(filtered);
+  if (extraFilters) {
+    const cc = extraFilters.centroCusto;
+    const cat = extraFilters.categoria;
+    if (cc && cc.length > 0) { const s = new Set(cc); filtered = filtered.filter(r => s.has(r[8] || '')); }
+    if (cat && cat.length > 0) { const s = new Set(cat); filtered = filtered.filter(r => s.has(r[3])); }
+  }
   let receita = 0, custosFixos = 0, custosVariaveis = 0;
   for (let i = 0; i < filtered.length; i++) {
     const row = filtered[i];
