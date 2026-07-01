@@ -2,7 +2,7 @@ module.exports = {
   cliente: {
     nome: "Gsia Financeiro",
     subdomain: "gsia-financeiro-bi",
-    coolify_app_uuid: "",
+    coolify_app_uuid: "xjbkkh9cmqxtkxent24wmh10",
     cor_primaria: "#3b82f6",
   },
 
