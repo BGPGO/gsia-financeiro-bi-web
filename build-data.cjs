@@ -89,6 +89,16 @@ const movimentos = readJson('movimentos', []);
 const contasCorrentes = readJson('contas_correntes', []);
 const saldos = readJson('saldos', null); // gerado por fetch-saldos.cjs (fluxo projetado)
 const summary = readJson('_summary', null);
+const impostosReceber = readJson('impostos_receber', []);
+const impostosPagar = readJson('impostos_pagar', []);
+
+// Mapa de impostos por codigo_lancamento_omie (nCodTitulo)
+const impostosMap = new Map();
+for (const r of [...impostosReceber, ...impostosPagar]) {
+  const total = (r.valor_iss || 0) + (r.valor_pis || 0) + (r.valor_inss || 0) + (r.valor_cofins || 0) + (r.valor_csll || 0) + (r.valor_ir || 0);
+  if (total > 0) impostosMap.set(r.codigo, total);
+}
+console.log(`  impostos: ${impostosMap.size} títulos com imposto (de ${impostosReceber.length + impostosPagar.length} consultados)`);
 
 // Bancos aceitos: lido de bi.config.js (bancos_ok). Array vazio = sem filtro (todas as contas).
 let _cfgBancos = [];
@@ -217,7 +227,7 @@ function normalize(t, kind) {
 // Tambem exclui transferencias (categoria Entrada/Saida de Transferencia)
 // porque sao movimentacoes internas entre contas, nao receita/despesa real.
 const TRANSFERENCIA_RE = /transfer[eê]ncia/i;
-const CLIENTE_PROPRIO_RE = /azul\s*mob/i;
+const CLIENTE_PROPRIO_RE = /gsia/i;
 let _cfgCatExcluir = [];
 try { _cfgCatExcluir = require('./bi.config.js').fontes?.omie?.categorias_excluir || []; } catch(e) {}
 const CATEGORIAS_EXCLUIR = new Set(_cfgCatExcluir);
@@ -251,9 +261,10 @@ function normalizeMovimento(m) {
   if (CLIENTE_PROPRIO_RE.test(cliente)) return null;
   const codCateg = d.cCodCateg || '';
 
-  const dataPago = parseBR(d.dDtCredito || d.dDtPagamento);
-  const dataVenc = parseBR(d.dDtVenc) || parseBR(d.dDtPrevisao) || parseBR(d.dDtEmissao);
-  const data_efetiva = realizado ? (dataPago || dataVenc) : dataVenc;
+  const dataPago = parseBR(d.dDtPagamento);
+  const dataVenc = parseBR(d.dDtVenc);
+  // IF(DataPagamento = BLANK(), dDtVenc, DataPagamento)
+  const data_efetiva = dataPago || dataVenc;
   if (!data_efetiva) return null;
   // Valor: realizado = nValPago (caixa). Previsto = nValAberto (saldo nao pago).
   let valor = realizado ? num(r.nValPago) : (num(r.nValAberto) || num(d.nValorTitulo));
@@ -269,6 +280,8 @@ function normalizeMovimento(m) {
     data_venc: dataVenc,
     data_efetiva,
     valor: Math.abs(valor),
+    valor_titulo: Math.abs(num(d.nValorTitulo) || valor),
+    impostos: impostosMap.get(d.nCodTitulo) || 0,
     status,
     realizado,
     cancelado: false,
@@ -323,16 +336,19 @@ function selectByFilter(items, filter) {
 
 // ---------- agregacoes ----------
 function buildMonthData(rec, desp, year) {
-  const data = MONTHS_FULL.map((m) => ({ m, receita: 0, despesa: 0 }));
+  const data = MONTHS_FULL.map((m) => ({ m, receita: 0, despesa: 0, receita_bruta: 0, impostos: 0 }));
   for (const t of rec) {
     const d = t.data_efetiva;
     if (!d || d.getFullYear() !== year) continue;
     data[d.getMonth()].receita += t.valor;
+    data[d.getMonth()].receita_bruta += (t.valor_titulo || t.valor);
+    data[d.getMonth()].impostos += (t.impostos || 0);
   }
   for (const t of desp) {
     const d = t.data_efetiva;
     if (!d || d.getFullYear() !== year) continue;
     data[d.getMonth()].despesa += t.valor;
+    data[d.getMonth()].impostos += (t.impostos || 0);
   }
   return data;
 }
@@ -652,6 +668,8 @@ const ALL_TX = ${JSON.stringify([
     t.centroCusto || '',
     0,
     '',
+    t.valor_titulo || t.valor,
+    t.impostos || 0,
   ]),
   ...despNorm.map(t => [
     'd',
@@ -665,6 +683,8 @@ const ALL_TX = ${JSON.stringify([
     t.centroCusto || '',
     String(t.codCateg || '').startsWith('2.07') ? 1 : 0,
     peClassOf(t.codCateg),
+    0,
+    t.impostos || 0,
   ]),
 ])};
 
@@ -677,7 +697,7 @@ const AVAILABLE_YEARS = ${JSON.stringify(AVAILABLE_YEARS)};
 function aggregateTx(txList, year) {
   year = year || REF_YEAR;
   const months = ${JSON.stringify(MONTHS_FULL)};
-  const MONTH_DATA = months.map(m => ({ m, receita: 0, despesa: 0 }));
+  const MONTH_DATA = months.map(m => ({ m, receita: 0, despesa: 0, receita_bruta: 0, impostos: 0 }));
   const recCat = new Map(), despCat = new Map();
   const recCli = new Map(), despForn = new Map();
   const extratoArr = [];
@@ -685,7 +705,7 @@ function aggregateTx(txList, year) {
   let totalReceita = 0, totalDespesa = 0;
 
   for (const row of txList) {
-    const [kind, mes, dia, categoria, cliente, valor, realizado, fornecedor, cc] = row;
+    const [kind, mes, dia, categoria, cliente, valor, realizado, fornecedor, cc, _si, _pe, valorTitulo, impostosTx] = row;
     if (!mes) continue;
     const ymonth = mes.slice(0,4);
     if (Number(ymonth) !== year) continue;
@@ -693,11 +713,14 @@ function aggregateTx(txList, year) {
     if (mIdx < 0 || mIdx > 11) continue;
     if (kind === 'r') {
       MONTH_DATA[mIdx].receita += valor;
+      MONTH_DATA[mIdx].receita_bruta += (valorTitulo || valor);
+      MONTH_DATA[mIdx].impostos += (impostosTx || 0);
       totalReceita += valor;
       recCat.set(categoria, (recCat.get(categoria) || 0) + valor);
       if (cliente) recCli.set(cliente, (recCli.get(cliente) || 0) + valor);
     } else {
       MONTH_DATA[mIdx].despesa += valor;
+      MONTH_DATA[mIdx].impostos += (impostosTx || 0);
       totalDespesa += valor;
       despCat.set(categoria, (despCat.get(categoria) || 0) + valor);
       if (fornecedor) despForn.set(fornecedor, (despForn.get(fornecedor) || 0) + valor);

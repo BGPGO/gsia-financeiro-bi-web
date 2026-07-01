@@ -328,6 +328,59 @@ const PageTesouraria = ({ filters, setFilters, onOpenFilters, statusFilter, dril
     }).sort((a, b) => b[5] - a[5]);
   }, [selectedDay, year, month, semInvestimento]);
 
+  // KPIs filtrados pelo dia selecionado
+  const dayKpis = useMemo(() => {
+    if (!selectedDay) return null;
+    let recReal = 0, recPend = 0, despReal = 0, despPend = 0;
+    for (const r of dayTx) {
+      const isRec = r[0] === 'r';
+      const isRealizado = !!r[6];
+      if (isRec && isRealizado) recReal += r[5];
+      else if (isRec && !isRealizado) recPend += r[5];
+      else if (!isRec && isRealizado) despReal += r[5];
+      else despPend += r[5];
+    }
+    return { recReal, recPend, despReal, despPend };
+  }, [selectedDay, dayTx]);
+
+  // Fluxo a vencer dia a dia: construído a partir de ALL_TX pendente (a_pagar_receber)
+  const fluxoDiaADia = useMemo(() => {
+    if (!window.ALL_TX) return [];
+    const yearStr = String(year || window.REF_YEAR);
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    // Agrupa títulos pendentes por data de vencimento
+    const porDia = new Map();
+    for (const r of window.ALL_TX) {
+      if (r[6]) continue; // skip realizado
+      if (!r[1] || !r[1].startsWith(yearStr)) continue;
+      if (semInvestimento && r[9]) continue;
+      const mm = parseInt(r[1].slice(5, 7), 10);
+      const dd = r[2];
+      if (!dd || dd < 1 || dd > 31) continue;
+      const dataKey = yearStr + '-' + String(mm).padStart(2, '0') + '-' + String(dd).padStart(2, '0');
+      const dataObj = new Date(Number(yearStr), mm - 1, dd);
+      if (dataObj < hoje) continue; // só futuro
+      if (!porDia.has(dataKey)) porDia.set(dataKey, { data: dataKey, receita: 0, despesa: 0 });
+      const entry = porDia.get(dataKey);
+      if (r[0] === 'r') entry.receita += r[5];
+      else entry.despesa += r[5];
+    }
+    const dias = [...porDia.values()].sort((a, b) => a.data.localeCompare(b.data));
+    // Calcula saldo acumulado projetado
+    let saldo = 0;
+    // Saldo inicial = valor líquido realizado até agora
+    saldo = Breal.TOTAL_RECEITA - Breal.TOTAL_DESPESA;
+    const result = [];
+    for (const d of dias) {
+      const liq = d.receita - d.despesa;
+      const saldoInicial = saldo;
+      saldo += liq;
+      result.push({ data: d.data, saldoInicial, receita: d.receita, despesa: d.despesa, valorLiquidoDia: liq, saldoFinal: saldo });
+    }
+    return result;
+  }, [year, semInvestimento, Breal]);
+
   return (
     <div className="page">
       <div className="page-title">
@@ -340,10 +393,10 @@ const PageTesouraria = ({ filters, setFilters, onOpenFilters, statusFilter, dril
       </div>
 
       <div className="row row-4">
-        <KpiTile label="Recebido (PAGO)" value={recebido.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sparkValues={recDiaSeg} sparkColor="var(--green)" tone="green" />
-        <KpiTile label="A receber" value={aReceber.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sparkValues={aReceberDiaSeg} sparkColor="var(--cyan)" tone="cyan" />
-        <KpiTile label="Pago" value={pago.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sparkValues={pagoDiaSeg} sparkColor="var(--red)" tone="red" />
-        <KpiTile label="A pagar" value={aPagar.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sparkValues={aPagarDiaSeg} sparkColor="var(--amber)" tone="amber" />
+        <KpiTile label={selectedDay ? `Recebido · Dia ${selectedDay}` : "Recebido (PAGO)"} value={(dayKpis ? dayKpis.recReal : recebido).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sparkValues={recDiaSeg} sparkColor="var(--green)" tone="green" />
+        <KpiTile label={selectedDay ? `A receber · Dia ${selectedDay}` : "A receber"} value={(dayKpis ? dayKpis.recPend : aReceber).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sparkValues={aReceberDiaSeg} sparkColor="var(--cyan)" tone="cyan" />
+        <KpiTile label={selectedDay ? `Pago · Dia ${selectedDay}` : "Pago"} value={(dayKpis ? dayKpis.despReal : pago).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sparkValues={pagoDiaSeg} sparkColor="var(--red)" tone="red" />
+        <KpiTile label={selectedDay ? `A pagar · Dia ${selectedDay}` : "A pagar"} value={(dayKpis ? dayKpis.despPend : aPagar).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} sparkValues={aPagarDiaSeg} sparkColor="var(--amber)" tone="amber" />
       </div>
 
       <div className="row row-1-1">
@@ -584,67 +637,74 @@ const PageTesouraria = ({ filters, setFilters, onOpenFilters, statusFilter, dril
 
         <div className="card">
           <h2 className="card-title">Fluxo a vencer (saldo projetado dia a dia)</h2>
-          {fpTotais.length === 0 ? null : (
-            <>
-              <div className="status-line" style={{ marginBottom: 8 }}>
-                {fpTotais.length} dias projetados · saldo inicial <b style={{ color: "var(--cyan)" }}>{B.fmt(fpSaldoInicial)}</b>
-              </div>
-              {fpRisco && (
-                <div className={`tesouraria-risco ${fpRisco.primeiroNegativo ? "risco-critico" : fpRisco.minSaldo < fpSaldoInicial * 0.3 ? "risco-atencao" : "risco-ok"}`}>
-                  {fpRisco.primeiroNegativo ? (
+          {(function() {
+            const rows = fpTotais.length > 0 ? fpTotais : fluxoDiaADia;
+            const usandoFP = fpTotais.length > 0;
+            const saldoIni = usandoFP ? fpSaldoInicial : (rows.length ? rows[0].saldoInicial : 0);
+            if (!rows.length) return <div className="status-line">Nenhum título pendente com vencimento futuro.</div>;
+            const fmtDLocal = (iso) => { if (!iso) return ''; const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; };
+            const minSaldo = Math.min(...rows.map(r => r.saldoFinal));
+            const minRow = rows.find(r => r.saldoFinal === minSaldo);
+            const saldoFinalUlt = rows[rows.length - 1].saldoFinal;
+            const primeiroNeg = rows.find(r => r.saldoFinal < 0);
+            const pontosChart = rows.map(r => ({ data: fmtDLocal(r.data), saldo: r.saldoFinal }));
+            return (
+              <>
+                <div className="status-line" style={{ marginBottom: 8 }}>
+                  {rows.length} dias projetados · saldo inicial <b style={{ color: "var(--cyan)" }}>{B.fmt(saldoIni)}</b>
+                </div>
+                <div className={`tesouraria-risco ${primeiroNeg ? "risco-critico" : minSaldo < saldoIni * 0.3 ? "risco-atencao" : "risco-ok"}`}>
+                  {primeiroNeg ? (
                     <>
                       <div className="risco-icon">⚠</div>
                       <div className="risco-body">
-                        <div className="risco-titulo">
-                          SALDO ENTRA EM VERMELHO EM <b>{fpRisco.primeiroNegativo.data}</b>
-                          {fpRisco.primeiroNegativo.diasAte != null && <span className="risco-dias"> (em {fpRisco.primeiroNegativo.diasAte} {fpRisco.primeiroNegativo.diasAte === 1 ? "dia" : "dias"})</span>}
-                        </div>
+                        <div className="risco-titulo">SALDO ENTRA EM VERMELHO EM <b>{fmtDLocal(primeiroNeg.data)}</b></div>
                         <div className="risco-min">
-                          Mínimo projetado: <b style={{ color: "var(--red)" }}>{B.fmt(fpRisco.minSaldo)}</b>{fpRisco.minSaldoData && <> em {fpRisco.minSaldoData}</>} · Saldo final: <b style={{ color: fpRisco.saldoFinal >= 0 ? "var(--green)" : "var(--red)" }}>{B.fmt(fpRisco.saldoFinal)}</b>
+                          Mínimo projetado: <b style={{ color: "var(--red)" }}>{B.fmt(minSaldo)}</b>{minRow && <> em {fmtDLocal(minRow.data)}</>} · Saldo final: <b style={{ color: saldoFinalUlt >= 0 ? "var(--green)" : "var(--red)" }}>{B.fmt(saldoFinalUlt)}</b>
                         </div>
                       </div>
                     </>
                   ) : (
                     <>
-                      <div className="risco-icon">{fpRisco.minSaldo < fpSaldoInicial * 0.3 ? "⚠" : "✓"}</div>
+                      <div className="risco-icon">{minSaldo < saldoIni * 0.3 ? "⚠" : "✓"}</div>
                       <div className="risco-body">
-                        <div className="risco-titulo">{fpRisco.minSaldo < fpSaldoInicial * 0.3 ? "SALDO MÍNIMO PROJETADO ABAIXO DE 30% DO ATUAL" : "CAIXA SAUDÁVEL NO HORIZONTE"}</div>
+                        <div className="risco-titulo">{minSaldo < saldoIni * 0.3 ? "SALDO MÍNIMO PROJETADO ABAIXO DE 30% DO ATUAL" : "CAIXA SAUDÁVEL NO HORIZONTE"}</div>
                         <div className="risco-detalhe">
-                          Mínimo: <b style={{ color: fpRisco.minSaldo < fpSaldoInicial * 0.3 ? "var(--amber)" : "var(--green)" }}>{B.fmt(fpRisco.minSaldo)}</b>{fpRisco.minSaldoData && <> em {fpRisco.minSaldoData}</>} · Final: <b style={{ color: "var(--green)" }}>{B.fmt(fpRisco.saldoFinal)}</b>
+                          Mínimo: <b style={{ color: minSaldo < saldoIni * 0.3 ? "var(--amber)" : "var(--green)" }}>{B.fmt(minSaldo)}</b>{minRow && <> em {fmtDLocal(minRow.data)}</>} · Final: <b style={{ color: "var(--green)" }}>{B.fmt(saldoFinalUlt)}</b>
                         </div>
                       </div>
                     </>
                   )}
                 </div>
-              )}
-              {fpPontos.length > 1 && (
-                <div className="tesouraria-mini-chart">
-                  <SaldoProjetadoChart pontos={fpPontos} saldoInicial={fpSaldoInicial} />
+                {pontosChart.length > 1 && (
+                  <div className="tesouraria-mini-chart">
+                    <SaldoProjetadoChart pontos={pontosChart} saldoInicial={saldoIni} />
+                  </div>
+                )}
+                <div className="t-scroll" style={{ maxHeight: 380 }}>
+                  <table className="t">
+                    <thead>
+                      <tr><th>Data</th><th className="num">Saldo Inicial</th><th className="num">Líquido</th><th className="num">Saldo Final</th></tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((r, i) => {
+                        const prev = i > 0 ? rows[i - 1].saldoFinal : saldoIni;
+                        const cruzouZero = prev >= 0 && r.saldoFinal < 0;
+                        return (
+                          <tr key={i} className={cruzouZero ? "tesouraria-row-critica" : ""}>
+                            <td style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{fmtDLocal(r.data)}</td>
+                            <td className="num" style={{ fontSize: 11 }}>{B.fmt(r.saldoInicial)}</td>
+                            <td className={`num ${r.valorLiquidoDia >= 0 ? "green" : "red"}`} style={{ fontSize: 11 }}>{r.valorLiquidoDia >= 0 ? '+' : ''}{B.fmt(r.valorLiquidoDia)}</td>
+                            <td className="num" style={{ fontSize: 11, fontWeight: 600, color: r.saldoFinal < 0 ? "var(--red)" : r.saldoFinal < saldoIni * 0.3 ? "var(--amber)" : "var(--cyan)" }}>{B.fmt(r.saldoFinal)}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
-              )}
-              <div className="t-scroll" style={{ maxHeight: 380 }}>
-                <table className="t">
-                  <thead>
-                    <tr><th>Data</th><th className="num">Saldo Inicial</th><th className="num">Líquido</th><th className="num">Saldo Final</th></tr>
-                  </thead>
-                  <tbody>
-                    {fpTotais.map((r, i) => {
-                      const prev = i > 0 ? fpTotais[i - 1].saldoFinal : fpSaldoInicial;
-                      const cruzouZero = prev >= 0 && r.saldoFinal < 0;
-                      return (
-                        <tr key={i} className={cruzouZero ? "tesouraria-row-critica" : ""}>
-                          <td style={{ fontFamily: "var(--font-mono)", fontSize: 11 }}>{fpFmtD(r.data)}</td>
-                          <td className="num" style={{ fontSize: 11 }}>{B.fmt(r.saldoInicial)}</td>
-                          <td className={`num ${r.valorLiquidoDia >= 0 ? "green" : "red"}`} style={{ fontSize: 11 }}>{r.valorLiquidoDia >= 0 ? '+' : ''}{B.fmt(r.valorLiquidoDia)}</td>
-                          <td className="num" style={{ fontSize: 11, fontWeight: 600, color: r.saldoFinal < 0 ? "var(--red)" : r.saldoFinal < fpSaldoInicial * 0.3 ? "var(--amber)" : "var(--cyan)" }}>{B.fmt(r.saldoFinal)}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
+              </>
+            );
+          })()}
         </div>
       </div>
     </div>

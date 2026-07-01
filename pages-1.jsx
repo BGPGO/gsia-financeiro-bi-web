@@ -31,10 +31,10 @@ const SectionHeading = ({ strong, soft }) => (
   <h2 className="card-title">{[strong, soft].filter(Boolean).join(" ")}</h2>
 );
 
-// Side-by-side monthly bars (Receita green / Despesa red) with floating value chips
-const OverviewBars = ({ data, height = 220, year = "2026", onBarClick, activeIdx }) => {
+// Side-by-side monthly bars (Receita green / Despesa red / Impostos orange) with floating value chips
+const OverviewBars = ({ data, height = 240, year = "2026", onBarClick, activeIdx }) => {
   const B = window.BIT;
-  const max = Math.max(...data.map(d => Math.max(d.receita, d.despesa)), 1);
+  const max = Math.max(...data.map(d => Math.max(d.receita, d.despesa, d.impostos || 0)), 1);
   // Dynamic tick step: target ~4-5 ticks regardless of magnitude
   const rawStep = max / 4;
   const mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
@@ -63,6 +63,7 @@ const OverviewBars = ({ data, height = 220, year = "2026", onBarClick, activeIdx
           {data.map((d, i) => {
             const rH = (d.receita / niceMax) * 100;
             const dH = (d.despesa / niceMax) * 100;
+            const iH = ((d.impostos || 0) / niceMax) * 100;
             const cls = "ov-bar-col" + (onBarClick ? " clickable" : "") +
               (hasActive && i === activeIdx ? " active" : "") +
               (hasActive && i !== activeIdx ? " dimmed" : "");
@@ -77,6 +78,9 @@ const OverviewBars = ({ data, height = 220, year = "2026", onBarClick, activeIdx
                   </div>
                   <div className="ov-bar red" style={{ height: `${dH}%` }} title={`Despesa: ${B.fmt(d.despesa)}`}>
                     <span className="ov-bar-chip">{fmtShort(d.despesa)}</span>
+                  </div>
+                  <div className="ov-bar orange" style={{ height: `${iH}%` }} title={`Impostos: ${B.fmt(d.impostos || 0)}`}>
+                    <span className="ov-bar-chip">{fmtShort(d.impostos || 0)}</span>
                   </div>
                 </div>
               </div>
@@ -264,16 +268,21 @@ const PageOverview = ({ filters, setFilters, onOpenFilters, statusFilter, drilld
             <div className="legend-pills">
               <span className="legend-pill green">
                 <span className="dot" />
-                <span className="lbl">Soma de receita</span>
+                <span className="lbl">Receita</span>
                 <span className="val">{B.fmtK(B.TOTAL_RECEITA)}</span>
               </span>
               <span className="legend-pill red">
                 <span className="dot" />
-                <span className="lbl">Soma de despesas</span>
+                <span className="lbl">Despesa</span>
                 <span className="val">{B.fmtK(B.TOTAL_DESPESA)}</span>
               </span>
+              <span className="legend-pill orange">
+                <span className="dot" />
+                <span className="lbl">Impostos</span>
+                <span className="val">{B.fmtK(B.MONTH_DATA.reduce((s, m) => s + (m.impostos || 0), 0))}</span>
+              </span>
             </div>
-            <OverviewBars data={B.MONTH_DATA} height={220} year={String(refYear)} onBarClick={handleBarMes} activeIdx={activeMonthIdx} />
+            <OverviewBars data={B.MONTH_DATA} height={240} year={String(refYear)} onBarClick={handleBarMes} activeIdx={activeMonthIdx} />
           </div>
 
           <div className="card">
