@@ -12,7 +12,7 @@ RUN npm ci --no-audit --no-fund
 
 # Scripts ETL + adapters
 COPY adapters/ ./adapters/
-COPY fetch-data.cjs fetch-saldos.cjs fetch-pedidos.cjs ./
+COPY fetch-data.cjs fetch-saldos.cjs fetch-pedidos.cjs fetch-impostos.cjs ./
 COPY build-data.cjs build-data-extras.cjs build-jsx.cjs ./
 COPY bi.config.js ./
 COPY components.jsx pages-1.jsx pages-2.jsx pages-3.jsx pages-4.jsx upsell-pages.jsx ./

@@ -49,6 +49,9 @@ if [ "$SKIP_FETCH" = "0" ]; then
 
   echo "[$(TS)] fetch-pedidos.cjs"
   node fetch-pedidos.cjs || echo "[$(TS)] fetch-pedidos falhou (continua)"
+
+  echo "[$(TS)] fetch-impostos.cjs"
+  node fetch-impostos.cjs || echo "[$(TS)] fetch-impostos falhou (continua)"
 fi
 
 if [ -f data/movimentos.json ]; then
