@@ -227,7 +227,7 @@ function normalize(t, kind) {
 // Tambem exclui transferencias (categoria Entrada/Saida de Transferencia)
 // porque sao movimentacoes internas entre contas, nao receita/despesa real.
 const TRANSFERENCIA_RE = /transfer[eê]ncia/i;
-const CLIENTE_PROPRIO_RE = /gsia/i;
+const CLIENTE_PROPRIO_RE = null; // desativado — pagamentos a propria GSIA sao despesas operacionais reais
 let _cfgCatExcluir = [];
 try { _cfgCatExcluir = require('./bi.config.js').fontes?.omie?.categorias_excluir || []; } catch(e) {}
 const CATEGORIAS_EXCLUIR = new Set(_cfgCatExcluir);
@@ -256,9 +256,8 @@ function normalizeMovimento(m) {
   // Operacional interno (Caixa, adiantamentos de viagem, contas de socio) fica fora.
   if (ccOk.size && !ccOk.has(String(d.nCodCC))) return null;
 
-  // Exclui lancamentos cujo cliente/fornecedor e a propria empresa (lancamentos internos).
   const cliente = getClienteNome(d.nCodCliente);
-  if (CLIENTE_PROPRIO_RE.test(cliente)) return null;
+  if (CLIENTE_PROPRIO_RE && CLIENTE_PROPRIO_RE.test(cliente)) return null;
   const codCateg = d.cCodCateg || '';
 
   const dataPago = parseBR(d.dDtPagamento);
